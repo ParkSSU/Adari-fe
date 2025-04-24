@@ -1,0 +1,19 @@
+import { ref, computed, reactive } from 'vue';
+import { defineStore } from 'pinia';
+
+export const useProductsStore = defineStore('products', () => {
+  const products = reactive({
+    items: [
+      { name: '플러스한판 (3-4인,800g)', count: 1, price: 44000 },
+      { name: '공기밥', count: 5, price: 1000 },
+      { name: '차돌된장찌개', count: 1, price: 5000 },
+      { name: '삼겹살 (200g)', count: 2, price: 12000 },
+      { name: '숙성김치', count: 1, price: 1000 },
+    ],
+    total_price: 79000,
+    store: '오복솥뚜껑 (영등포점)',
+    date: '2025-02-26',
+  });
+
+  return { products };
+});
