@@ -7,8 +7,11 @@ export const useUserStore = defineStore('user', () => {
 
   const setPeopleCount = (count) => {
     peopleCount.value = count;
-    names.value = Array.from({ length: count }, (_, i) => names.value[i] || '');
   };
 
-  return { peopleCount, names, setPeopleCount };
+  const setNames = (newNames) => {
+    names.value = newNames;
+  };
+
+  return { peopleCount, names, setPeopleCount, setNames };
 });

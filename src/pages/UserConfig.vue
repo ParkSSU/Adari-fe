@@ -42,28 +42,32 @@
 
 <script setup>
 import { watch, computed } from 'vue';
-
 import { useUserStore } from '@/stores/userStore';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+
 const userStore = useUserStore();
 
-// peopleCount, names를 스토어에서 직접 사용
+// peopleCount, names를 스토어에서 가져옴
 const peopleCount = computed({
   get: () => userStore.peopleCount,
   set: (val) => userStore.setPeopleCount(val),
 });
-
 const names = computed(() => userStore.names);
 
 // 사람 수가 바뀌면 이름 배열 크기를 조정
 watch(peopleCount, (newVal) => {
   if (newVal < 0) {
     peopleCount.value = 0;
-    names.value = [];
+    userStore.setNames([]);
   } else {
-    names.value = Array.from(
+    const updatedNames = Array.from(
       { length: newVal },
-      (_, i) => names.value[i] || ''
+      (_, i) => userStore.names[i] || ''
     );
+    userStore.setNames(updatedNames);
   }
 });
 
@@ -73,8 +77,11 @@ const isFormValid = computed(() => {
     names.value.length > 0 && names.value.every((name) => name.trim() !== '')
   );
 });
-
 const handleSubmit = () => {
-  alert(`저장 완료 [${userStore.names.join(', ')}]`);
+  const confirmed = confirm(`저장할까요?\n[${userStore.names.join(', ')}]`);
+  if (confirmed) {
+    router.push('/edit');
+  }
 };
+
 </script>
