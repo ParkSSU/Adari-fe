@@ -1,0 +1,87 @@
+<template>
+  <div class="container mt-4">
+    <form @submit.prevent="handleSubmit">
+      <div class="mb-3">
+        <label for="howManyPeople" class="form-label">Enter number</label>
+        <input
+          type="number"
+          class="form-control"
+          id="howManyPeople"
+          v-model.number="peopleCount"
+          min="1"
+        />
+        <div class="form-text">How many people are you?</div>
+      </div>
+
+      <div v-for="(name, index) in names" :key="index" class="mb-2">
+        <label :for="`name-${index}`" class="form-label small mb-1"
+          >Name {{ index + 1 }}</label
+        >
+        <input
+          type="text"
+          class="form-control"
+          :id="`name-${index}`"
+          v-model="names[index]"
+          placeholder="Enter name"
+        />
+      </div>
+
+      <div class="mt-4">
+        <button
+          type="submit"
+          class="btn btn-secondary me-2"
+          :disabled="!isFormValid"
+        >
+          Submit
+        </button>
+        <router-link to="/" class="btn btn-secondary">Back to Home</router-link>
+      </div>
+    </form>
+  </div>
+</template>
+
+<script setup>
+import { watch, computed } from 'vue';
+import { useUserStore } from '@/stores/userStore';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+
+const userStore = useUserStore();
+
+// peopleCount, names를 스토어에서 가져옴
+const peopleCount = computed({
+  get: () => userStore.peopleCount,
+  set: (val) => userStore.setPeopleCount(val),
+});
+const names = computed(() => userStore.names);
+
+// 사람 수가 바뀌면 이름 배열 크기를 조정
+watch(peopleCount, (newVal) => {
+  if (newVal < 0) {
+    peopleCount.value = 0;
+    userStore.setNames([]);
+  } else {
+    const updatedNames = Array.from(
+      { length: newVal },
+      (_, i) => userStore.names[i] || ''
+    );
+    userStore.setNames(updatedNames);
+  }
+});
+
+// 모든 이름이 비어있지 않아야 버튼 활성화
+const isFormValid = computed(() => {
+  return (
+    names.value.length > 0 && names.value.every((name) => name.trim() !== '')
+  );
+});
+const handleSubmit = () => {
+  const confirmed = confirm(`저장할까요?\n[${userStore.names.join(', ')}]`);
+  if (confirmed) {
+    router.push('/edit');
+  }
+};
+
+</script>
